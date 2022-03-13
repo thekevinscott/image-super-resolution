@@ -80,7 +80,7 @@ class Trainer:
                 'feature_extractor': 'mse',
             },
             metrics={'generator': 'PSNR_Y'},
-            make_basename=None,
+            basename=None,
     ):
         self.generator = generator
         self.discriminator = discriminator
@@ -123,7 +123,7 @@ class Trainer:
             weights_generator=self.weights_generator,
             weights_discriminator=self.weights_discriminator,
             fallback_save_every_n_epochs=fallback_save_every_n_epochs,
-            make_basename=make_basename,
+            basename=basename,
         )
 
         self.train_dh = DataHandler(
