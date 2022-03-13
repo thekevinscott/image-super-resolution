@@ -50,6 +50,7 @@ class TrainerHelper:
             fallback_save_every_n_epochs=2,
             max_n_other_weights=5,
             max_n_best_weights=5,
+            make_basename=None,
     ):
         self.generator = generator
         self.dirs = {'logs': Path(logs_dir), 'weights': Path(weights_dir)}
@@ -69,7 +70,12 @@ class TrainerHelper:
         
         self.fallback_save_every_n_epochs = fallback_save_every_n_epochs
         self.lr_dir = Path(lr_train_dir)
-        self.basename = self._make_basename()
+        if make_basename is None:
+            print('make_basename is not specified, use our own')
+            self.basename = self._make_basename()
+        else:
+            print('make_basename is specified, use it')
+            self.basename = make_basename()
         self.session_id = self.get_session_id(basename=None)
         self.session_config_name = 'session_config.yml'
         self.callback_paths = self._make_callback_paths()
