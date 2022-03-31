@@ -1,3 +1,4 @@
+from bz2 import compress
 import os
 
 import imageio
@@ -125,8 +126,15 @@ class DataHandler:
         crops['hr'] = np.array(crops['hr'])
         return crops
     
-    def _apply_transform(self, img, transform_selection):
+    def _apply_transform(self, img, transform_selection, kind, compression_quality=None, sharpen_amount=None):
         """ Rotates and flips input image according to transform_selection. """
+
+        if kind == 'lr' and compression_quality is not None:
+            print('Apply compression of', compression_quality)
+            print(type(img))
+        elif kind == 'hr' and sharpen_amount is not None:
+            print('Apply sharpening of', sharpen_amount)
+            print(type(img))
         
         rotate = {
             0: lambda x: x,
@@ -148,15 +156,15 @@ class DataHandler:
         
         return img
     
-    def _transform_batch(self, batch, transforms):
+    def _transform_batch(self, batch, transforms, kind, compression_quality=None, sharpen_amount=None):
         """ Transforms each individual image of the batch independently. """
         
         t_batch = np.array(
-            [self._apply_transform(img, transforms[i]) for i, img in enumerate(batch)]
+            [self._apply_transform(img, transforms[i], kind, compression_quality=compression_quality, sharpen_amount=sharpen_amount) for i, img in enumerate(batch)]
         )
         return t_batch
     
-    def get_batch(self, batch_size, idx=None, flatness=0.0):
+    def get_batch(self, batch_size, idx=None, flatness=0.0, compression_quality=None, sharpen_amount=None):
         """
         Returns a dictionary with keys ('lr', 'hr') containing training batches
         of Low Res and High Res image patches.
@@ -176,8 +184,8 @@ class DataHandler:
             img[res] = imageio.imread(img_path) / 255.0
         batch = self._crop_imgs(img, batch_size, flatness)
         transforms = np.random.randint(0, 3, (batch_size, 2))
-        batch['lr'] = self._transform_batch(batch['lr'], transforms)
-        batch['hr'] = self._transform_batch(batch['hr'], transforms)
+        batch['lr'] = self._transform_batch(batch['lr'], transforms, 'lr', compression_quality=compression_quality, sharpen_amount=sharpen_amount)
+        batch['hr'] = self._transform_batch(batch['hr'], transforms, 'hr', compression_quality=compression_quality, sharpen_amount=sharpen_amount)
         
         return batch
     

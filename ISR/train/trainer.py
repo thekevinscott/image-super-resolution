@@ -276,7 +276,7 @@ class Trainer:
 
         return settings
 
-    def train(self, epochs, steps_per_epoch, batch_size, monitored_metrics):
+    def train(self, epochs, steps_per_epoch, batch_size, monitored_metrics,compression_quality=None,sharpen_amount=None):
         """
         Carries on the training for the given number of epochs.
         Sends the losses to Tensorboard.
@@ -322,7 +322,7 @@ class Trainer:
 
             epoch_start = time()
             for step in tqdm(range(steps_per_epoch)):
-                batch = self.train_dh.get_batch(batch_size, flatness=flatness)
+                batch = self.train_dh.get_batch(batch_size, flatness=flatness, compression_quality=compression_quality, sharpen_amount=sharpen_amount)
                 y_train = [batch['hr']]
                 training_losses = {}
 
