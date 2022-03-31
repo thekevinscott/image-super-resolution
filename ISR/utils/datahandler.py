@@ -129,12 +129,12 @@ class DataHandler:
     def _apply_transform(self, img, transform_selection, kind, compression_quality=None, sharpen_amount=None):
         """ Rotates and flips input image according to transform_selection. """
 
-        if kind == 'lr' and compression_quality is not None:
-            print('Apply compression of', compression_quality)
-            print(type(img))
-        elif kind == 'hr' and sharpen_amount is not None:
-            print('Apply sharpening of', sharpen_amount)
-            print(type(img))
+        # if kind == 'lr' and compression_quality is not None:
+        #     print('Apply compression of', compression_quality)
+        #     print(type(img))
+        # elif kind == 'hr' and sharpen_amount is not None:
+        #     print('Apply sharpening of', sharpen_amount)
+        #     print(type(img))
         
         rotate = {
             0: lambda x: x,
