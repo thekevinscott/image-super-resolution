@@ -52,7 +52,14 @@ class DataHandler:
         
         # the order of these asserts is important for testing
         assert len(self.img_list['hr']) == self.img_list['hr'].shape[0], 'UnevenDatasets'
-        assert self._matching_datasets(), 'Input/LabelsMismatch'
+        try:
+            assert self._matching_datasets(), 'Input/LabelsMismatch'
+        except:
+            LR_name_root = [x.split('.')[0].rsplit('x', 1)[0] for x in self.img_list['lr']]
+            HR_name_root = [x.split('.')[0] for x in self.img_list['hr']]
+            print(LR_name_root)
+            print(HR_name_root)
+            raise Exception('Mismatch of datasets')
     
     def _matching_datasets(self):
         """ Rough file name matching between lr and hr directories. """
@@ -129,6 +136,7 @@ class DataHandler:
     def _apply_transform(self, img, transform_selection, kind, compression_quality=None, sharpen_amount=None):
         """ Rotates and flips input image according to transform_selection. """
 
+        # the type: np.ndarray
         # if kind == 'lr' and compression_quality is not None:
         #     print('Apply compression of', compression_quality)
         #     print(type(img))
