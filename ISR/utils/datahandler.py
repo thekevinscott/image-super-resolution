@@ -210,6 +210,7 @@ class DataHandler:
             hr_img_path = os.path.join(self.folders['hr'], self.img_list['hr'][idx])
             img['hr'] = imageio.imread(hr_img_path) / 255.0
         else:
+            print('idx is specified', idx)
             for res in ['lr', 'hr']:
                 img_path = os.path.join(self.folders[res], self.img_list[res][idx])
                 img[res] = imageio.imread(img_path) / 255.0
