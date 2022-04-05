@@ -33,7 +33,31 @@ class DataHandler:
         self._check_dataset()
 
     def _is_valid_img(self, file, res):
+        folder = self.folders[res]
+        img = imageio.imread(f'{folder}/{file}') / 255.0
+        min_side = min(img.shape[0:2])
+        if min_side < self.patch_size[res]:
+            return False
         return file.endswith(self.extensions)
+        #         if not idx:
+        #     # randomly select one image. idx is given at validation time.
+        #     min_side = 0
+        #     while min_side < self.patch_size['lr']:
+        #         idx = np.random.choice(range(len(self.img_list['hr'])))
+        #         lr_img_path = os.path.join(self.folders['lr'], self.img_list['lr'][idx])
+        #         img['lr'] = imageio.imread(lr_img_path) / 255.0
+        #         data = np.asarray(img['lr'])
+        #         min_side = min(data.shape[0:2])
+        #         print('min side', min_side)
+        #         print('self patch size', self.patch_size['lr'])
+        #     hr_img_path = os.path.join(self.folders['hr'], self.img_list['hr'][idx])
+        #     img['hr'] = imageio.imread(hr_img_path) / 255.0
+        # else:
+        #     print('idx is specified', idx)
+        #     for res in ['lr', 'hr']:
+        #         img_path = os.path.join(self.folders[res], self.img_list[res][idx])
+        #         img[res] = imageio.imread(img_path) / 255.0
+        # print('lr shape', img['lr'].shape)
     
     def _make_img_list(self):
         """ Creates a dictionary of lists of the acceptable images contained in lr_dir and hr_dir. """
@@ -43,6 +67,8 @@ class DataHandler:
             file_names = [file for file in file_names if self._is_valid_img(file, res)]
             
             self.img_list[res] = np.sort(file_names)
+
+        assert self.img_list['hr'] == self.img_list['lr'], f'Images do not match {self.img_list["hr"]} {self.img_list["lr"]}'
         
         if self.n_validation_samples:
             samples = np.random.choice(
@@ -198,23 +224,12 @@ class DataHandler:
         img = {}
         if not idx:
             # randomly select one image. idx is given at validation time.
-            min_side = 0
-            while min_side < self.patch_size['lr']:
-                idx = np.random.choice(range(len(self.img_list['hr'])))
-                lr_img_path = os.path.join(self.folders['lr'], self.img_list['lr'][idx])
-                img['lr'] = imageio.imread(lr_img_path) / 255.0
-                data = np.asarray(img['lr'])
-                min_side = min(data.shape[0:2])
-                print('min side', min_side)
-                print('self patch size', self.patch_size['lr'])
-            hr_img_path = os.path.join(self.folders['hr'], self.img_list['hr'][idx])
-            img['hr'] = imageio.imread(hr_img_path) / 255.0
-        else:
-            print('idx is specified', idx)
-            for res in ['lr', 'hr']:
-                img_path = os.path.join(self.folders[res], self.img_list[res][idx])
-                img[res] = imageio.imread(img_path) / 255.0
-        print('lr shape', img['lr'].shape)
+            idx = np.random.choice(range(len(self.img_list['hr'])))
+
+        for res in ['lr', 'hr']:
+            img_path = os.path.join(self.folders[res], self.img_list[res][idx])
+            img[res] = imageio.imread(img_path) / 255.0
+
         batch = self._crop_imgs(img, batch_size, flatness)
         transforms = np.random.randint(0, 3, (batch_size, 2))
         batch['lr'] = self._transform_batch(batch['lr'], transforms, 'lr', compression_quality=compression_quality, sharpen_amount=sharpen_amount)
