@@ -81,6 +81,7 @@ class Trainer:
             },
             metrics={'generator': 'PSNR_Y'},
             basename=None,
+            should_check_size=True,
     ):
         self.generator = generator
         self.discriminator = discriminator
@@ -132,6 +133,7 @@ class Trainer:
             patch_size=self.lr_patch_size,
             scale=self.scale,
             n_validation_samples=None,
+            should_check_size=should_check_size,
         )
         self.valid_dh = DataHandler(
             lr_dir=lr_valid_dir,
@@ -139,6 +141,7 @@ class Trainer:
             patch_size=self.lr_patch_size,
             scale=self.scale,
             n_validation_samples=n_validation,
+            should_check_size=should_check_size,
         )
 
     def _parameters_sanity_check(self):

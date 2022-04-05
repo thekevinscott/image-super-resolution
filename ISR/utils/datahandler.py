@@ -66,21 +66,20 @@ class DataHandler:
         """ Creates a dictionary of lists of the acceptable images contained in lr_dir and hr_dir. """
         
         assert len(list(os.listdir(self.folders['hr']))) == len(list(os.listdir(self.folders['lr']))), "Different number of files in lr and hr directories"
-        for res in ['hr', 'lr']:
-            lr_file_names = []
-            hr_file_names = []
-            for file in tqdm(list(os.listdir(self.folders['lr']))):
-                hr_folder = self.folders['hr']
-                if os.path.exists(f'{hr_folder}/{file}'):
-                    if self._is_valid_img(file, 'lr', should_check_size=should_check_size):
-                        lr_file_names.append(file)
-                        hr_file_names.append(file)
-            
-            self.img_list['lr'] = np.sort(lr_file_names)
-            self.img_list['hr'] = np.sort(hr_file_names)
+        lr_file_names = []
+        hr_file_names = []
+        for file in tqdm(list(os.listdir(self.folders['lr']))):
+            hr_folder = self.folders['hr']
+            if os.path.exists(f'{hr_folder}/{file}'):
+                if self._is_valid_img(file, 'lr', should_check_size=should_check_size):
+                    lr_file_names.append(file)
+                    hr_file_names.append(file)
+        
+        self.img_list['lr'] = np.sort(lr_file_names)
+        self.img_list['hr'] = np.sort(hr_file_names)
 
-        print(self.img_list['hr'])
-        print(self.img_list['lr'])
+        # print(self.img_list['hr'])
+        # print(self.img_list['lr'])
         if np.array_equal(self.img_list['hr'], self.img_list['lr']) is False:
             raise Exception('Images do not match')
         
