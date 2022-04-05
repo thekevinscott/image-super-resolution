@@ -65,13 +65,19 @@ class DataHandler:
     def _make_img_list(self, should_check_size=True):
         """ Creates a dictionary of lists of the acceptable images contained in lr_dir and hr_dir. """
         
+        assert len(list(os.listdir(self.folders['hr']))) == len(list(os.listdir(self.folders['lr']))), "Different number of files in lr and hr directories"
         for res in ['hr', 'lr']:
-            file_names = []
-            for file in tqdm(list(os.listdir(self.folders[res])), desc=f'Files for {res}'):
-                if self._is_valid_img(file, res, should_check_size=should_check_size):
-                    file_names.append(file)
+            lr_file_names = []
+            hr_file_names = []
+            for file in tqdm(list(os.listdir(self.folders['lr']))):
+                hr_folder = self.folders['hr']
+                if os.path.exists(f'{hr_folder}/{file}'):
+                    if self._is_valid_img(file, 'lr', should_check_size=should_check_size):
+                        lr_file_names.append(file)
+                        hr_file_names.append(file)
             
-            self.img_list[res] = np.sort(file_names)
+            self.img_list['lr'] = np.sort(lr_file_names)
+            self.img_list['hr'] = np.sort(hr_file_names)
 
         print(self.img_list['hr'])
         print(self.img_list['lr'])
