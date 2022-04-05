@@ -73,9 +73,9 @@ class DataHandler:
             
             self.img_list[res] = np.sort(file_names)
 
-        if json.dumps(self.img_list['hr']) != json.dumps(self.img_list['lr']):
-            print(self.img_list['hr'])
-            print(self.img_list['lr'])
+        print(self.img_list['hr'])
+        print(self.img_list['lr'])
+        if np.array_equal(self.img_list['hr'], self.img_list['lr']) is False:
             raise Exception('Images do not match')
         
         if self.n_validation_samples:
