@@ -1,5 +1,6 @@
 from bz2 import compress
 import os
+from tqdm import tqdm
 
 import imageio
 import numpy as np
@@ -63,8 +64,10 @@ class DataHandler:
         """ Creates a dictionary of lists of the acceptable images contained in lr_dir and hr_dir. """
         
         for res in ['hr', 'lr']:
-            file_names = os.listdir(self.folders[res])
-            file_names = [file for file in file_names if self._is_valid_img(file, res)]
+            file_names = []
+            for file in tqdm(list(os.listdir(self.folders[res])), desc=f'Files for {res}'):
+                if self._is_valid_img(file, res):
+                    file_names.append(file)
             
             self.img_list[res] = np.sort(file_names)
 
