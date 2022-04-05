@@ -1,4 +1,5 @@
 from bz2 import compress
+import json
 import os
 from tqdm import tqdm
 
@@ -21,7 +22,7 @@ class DataHandler:
             DataHandler is used to generate validation sets.
     """
     
-    def __init__(self, lr_dir, hr_dir, patch_size, scale, n_validation_samples=None):
+    def __init__(self, lr_dir, hr_dir, patch_size, scale, n_validation_samples=None, should_check_size=True):
         self.folders = {'hr': hr_dir, 'lr': lr_dir}  # image folders
         self.extensions = ('.png', '.jpeg', '.jpg')  # admissible extension
         self.img_list = {}  # list of file names
@@ -30,15 +31,16 @@ class DataHandler:
         self.scale = scale
         self.patch_size = {'lr': patch_size, 'hr': patch_size * self.scale}
         self.logger = get_logger(__name__)
-        self._make_img_list()
+        self._make_img_list(should_check_size=should_check_size)
         self._check_dataset()
 
-    def _is_valid_img(self, file, res):
-        folder = self.folders[res]
-        img = imageio.imread(f'{folder}/{file}') / 255.0
-        min_side = min(img.shape[0:2])
-        if min_side < self.patch_size[res]:
-            return False
+    def _is_valid_img(self, file, res, should_check_size=True):
+        if should_check_size:
+            folder = self.folders[res]
+            img = imageio.imread(f'{folder}/{file}') / 255.0
+            min_side = min(img.shape[0:2])
+            if min_side < self.patch_size[res]:
+                return False
         return file.endswith(self.extensions)
         #         if not idx:
         #     # randomly select one image. idx is given at validation time.
@@ -60,18 +62,21 @@ class DataHandler:
         #         img[res] = imageio.imread(img_path) / 255.0
         # print('lr shape', img['lr'].shape)
     
-    def _make_img_list(self):
+    def _make_img_list(self, should_check_size=True):
         """ Creates a dictionary of lists of the acceptable images contained in lr_dir and hr_dir. """
         
         for res in ['hr', 'lr']:
             file_names = []
             for file in tqdm(list(os.listdir(self.folders[res])), desc=f'Files for {res}'):
-                if self._is_valid_img(file, res):
+                if self._is_valid_img(file, res, should_check_size=should_check_size):
                     file_names.append(file)
             
             self.img_list[res] = np.sort(file_names)
 
-        assert self.img_list['hr'] == self.img_list['lr'], f'Images do not match {self.img_list["hr"]} {self.img_list["lr"]}'
+        if json.dumps(self.img_list['hr']) != json.dumps(self.img_list['lr']):
+            print(self.img_list['hr'])
+            print(self.img_list['lr'])
+            raise Exception('Images do not match')
         
         if self.n_validation_samples:
             samples = np.random.choice(
