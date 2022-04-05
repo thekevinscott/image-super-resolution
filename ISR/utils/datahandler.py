@@ -205,6 +205,8 @@ class DataHandler:
                 img['lr'] = imageio.imread(lr_img_path) / 255.0
                 data = np.asarray(img['lr'])
                 min_side = min(data.shape[0:2])
+                print('min side', min_side)
+                print('self patch size', self.patch_size['lr'])
             hr_img_path = os.path.join(self.folders['hr'], self.img_list['hr'][idx])
             img['hr'] = imageio.imread(hr_img_path) / 255.0
         else:
