@@ -31,13 +31,17 @@ class DataHandler:
         self.logger = get_logger(__name__)
         self._make_img_list()
         self._check_dataset()
+
+    def _is_valid_img(self, file, res):
+        return file.endswith(self.extensions)
     
     def _make_img_list(self):
         """ Creates a dictionary of lists of the acceptable images contained in lr_dir and hr_dir. """
         
         for res in ['hr', 'lr']:
             file_names = os.listdir(self.folders[res])
-            file_names = [file for file in file_names if file.endswith(self.extensions)]
+            file_names = [file for file in file_names if self._is_valid_img(file, res)]
+            
             self.img_list[res] = np.sort(file_names)
         
         if self.n_validation_samples:
@@ -100,18 +104,26 @@ class DataHandler:
         accepted_slices['lr'] = []
         top_left = {'x': {}, 'y': {}}
         n = 50 * batch_size
-        for i, axis in enumerate(['x', 'y']):
-            top_left[axis]['lr'] = np.random.randint(
-                0, imgs['lr'].shape[i] - self.patch_size['lr'] + 1, batch_size + n
-            )
-            top_left[axis]['hr'] = top_left[axis]['lr'] * self.scale
-        for res in ['lr', 'hr']:
-            slices[res] = np.array(
-                [
-                    {'x': (x, x + self.patch_size[res]), 'y': (y, y + self.patch_size[res])}
-                    for x, y in zip(top_left['x'][res], top_left['y'][res])
-                ]
-            )
+        try:
+            for i, axis in enumerate(['x', 'y']):
+                top_left[axis]['lr'] = np.random.randint(
+                    0, imgs['lr'].shape[i] - self.patch_size['lr'] + 1, batch_size + n
+                )
+                top_left[axis]['hr'] = top_left[axis]['lr'] * self.scale
+            for res in ['lr', 'hr']:
+                slices[res] = np.array(
+                    [
+                        {'x': (x, x + self.patch_size[res]), 'y': (y, y + self.patch_size[res])}
+                        for x, y in zip(top_left['x'][res], top_left['y'][res])
+                    ]
+                )
+        except Exception as e:
+            print('Exception with image')
+            print('lr shape', imgs['lr'].shape)
+            print('patch size', self.patch_size)
+            print('batch_size', batch_size)
+            print('n', n)
+            raise e
         
         for slice_index, s in enumerate(slices['lr']):
             candidate_crop = imgs['lr'][s['x'][0]: s['x'][1], s['y'][0]: s['y'][1], slice(None)]
@@ -183,13 +195,22 @@ class DataHandler:
                 Determines what level of detail the patches need to meet. 0 means any patch is accepted.
         """
         
+        img = {}
         if not idx:
             # randomly select one image. idx is given at validation time.
-            idx = np.random.choice(range(len(self.img_list['hr'])))
-        img = {}
-        for res in ['lr', 'hr']:
-            img_path = os.path.join(self.folders[res], self.img_list[res][idx])
-            img[res] = imageio.imread(img_path) / 255.0
+            min_side = 0
+            while min_side < self.patch_size['lr']:
+                idx = np.random.choice(range(len(self.img_list['hr'])))
+                lr_img_path = os.path.join(self.folders['lr'], self.img_list['lr'][idx])
+                img['lr'] = imageio.imread(lr_img_path) / 255.0
+                data = np.asarray(img['lr'])
+                min_side = min(data.shape[0:2])
+            hr_img_path = os.path.join(self.folders['hr'], self.img_list['hr'][idx])
+            img['hr'] = imageio.imread(hr_img_path) / 255.0
+        else:
+            for res in ['lr', 'hr']:
+                img_path = os.path.join(self.folders[res], self.img_list[res][idx])
+                img[res] = imageio.imread(img_path) / 255.0
         batch = self._crop_imgs(img, batch_size, flatness)
         transforms = np.random.randint(0, 3, (batch_size, 2))
         batch['lr'] = self._transform_batch(batch['lr'], transforms, 'lr', compression_quality=compression_quality, sharpen_amount=sharpen_amount)
