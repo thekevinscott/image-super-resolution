@@ -1,6 +1,7 @@
 from bz2 import compress
 import json
 import os
+import random
 from tqdm import tqdm
 
 import imageio
@@ -185,7 +186,7 @@ class DataHandler:
         crops['hr'] = np.array(crops['hr'])
         return crops
     
-    def _apply_transform(self, img, transform_selection, kind, compression_quality=None, sharpen_amount=None, i=None):
+    def _apply_transform(self, img, transform_selection, kind, compression_quality=None, sharpen_amount=None, i=None, vary_compression_quality=False):
         """ Rotates and flips input image according to transform_selection. """
 
         write_image(f'/opt/ml/output/{kind}-{i}-orig.png', img)
@@ -193,6 +194,8 @@ class DataHandler:
         # the type: np.ndarray
         if kind == 'lr' and compression_quality is not None:
             # print('Apply compression of', compression_quality)
+            if vary_compression_quality:
+                compression_quality = random.randint(compression_quality, 100)
             img = compress_image(img, quality=compression_quality)
             write_image(f'/opt/ml/output/{kind}-{i}-compressed-{compression_quality}.png', img)
         elif kind == 'hr' and sharpen_amount is not None:
@@ -220,15 +223,15 @@ class DataHandler:
         
         return img
     
-    def _transform_batch(self, batch, transforms, kind, compression_quality=None, sharpen_amount=None):
+    def _transform_batch(self, batch, transforms, kind, compression_quality=None, sharpen_amount=None, vary_compression_quality=False):
         """ Transforms each individual image of the batch independently. """
         
         t_batch = np.array(
-            [self._apply_transform(img, transforms[i], kind, compression_quality=compression_quality, sharpen_amount=sharpen_amount, i=i) for i, img in enumerate(batch)]
+            [self._apply_transform(img, transforms[i], kind, compression_quality=compression_quality, sharpen_amount=sharpen_amount, i=i, vary_compression_quality=vary_compression_quality) for i, img in enumerate(batch)]
         )
         return t_batch
     
-    def get_batch(self, batch_size, idx=None, flatness=0.0, compression_quality=None, sharpen_amount=None):
+    def get_batch(self, batch_size, idx=None, flatness=0.0, compression_quality=None, sharpen_amount=None, vary_compression_quality=False):
         """
         Returns a dictionary with keys ('lr', 'hr') containing training batches
         of Low Res and High Res image patches.
@@ -250,8 +253,8 @@ class DataHandler:
 
         batch = self._crop_imgs(img, batch_size, flatness)
         transforms = np.random.randint(0, 3, (batch_size, 2))
-        batch['lr'] = self._transform_batch(batch['lr'], transforms, 'lr', compression_quality=compression_quality, sharpen_amount=sharpen_amount)
-        batch['hr'] = self._transform_batch(batch['hr'], transforms, 'hr', compression_quality=compression_quality, sharpen_amount=sharpen_amount)
+        batch['lr'] = self._transform_batch(batch['lr'], transforms, 'lr', compression_quality=compression_quality, vary_compression_quality=vary_compression_quality)
+        batch['hr'] = self._transform_batch(batch['hr'], transforms, 'hr', sharpen_amount=sharpen_amount)
         
         return batch
     
