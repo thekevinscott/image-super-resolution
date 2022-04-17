@@ -7,6 +7,7 @@ import imageio
 import numpy as np
 
 from ISR.utils.logger import get_logger
+from ISR.utils.utils import sharpen_image, compress_image, write_image
 
 
 class DataHandler:
@@ -187,13 +188,17 @@ class DataHandler:
     def _apply_transform(self, img, transform_selection, kind, compression_quality=None, sharpen_amount=None):
         """ Rotates and flips input image according to transform_selection. """
 
+        write_image('/opt/ml/output/orig.png', img)
+
         # the type: np.ndarray
-        # if kind == 'lr' and compression_quality is not None:
-        #     print('Apply compression of', compression_quality)
-        #     print(type(img))
-        # elif kind == 'hr' and sharpen_amount is not None:
-        #     print('Apply sharpening of', sharpen_amount)
-        #     print(type(img))
+        if kind == 'lr' and compression_quality is not None:
+            # print('Apply compression of', compression_quality)
+            img = compress_image(img, quality=compression_quality)
+            write_image('/opt/ml/output/compressed.png', img)
+        elif kind == 'hr' and sharpen_amount is not None:
+            # print('Apply sharpening of', sharpen_amount)
+            img = sharpen_image(img, amount=sharpen_amount)
+            write_image('/opt/ml/output/sharpened.png', img)
         
         rotate = {
             0: lambda x: x,
@@ -212,6 +217,7 @@ class DataHandler:
         
         img = rotate[rot_direction](img)
         img = flip[flip_axis](img)
+        write_image('/opt/ml/output/final.png', img)
         
         return img
     

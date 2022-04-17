@@ -4,10 +4,27 @@ from datetime import datetime
 
 import numpy as np
 import yaml
+from PIL import Image, ImageEnhance
+from io import BytesIO
+import imageio
 
 from ISR.utils.logger import get_logger
 
 logger = get_logger(__name__)
+
+def write_image(dest: str, im: np.ndarray):
+    imageio.imwrite(dest, (im * 255).astype(np.uint8))
+
+def compress_image(im: np.ndarray, quality=1) -> np.ndarray:
+    im = Image.fromarray((im * 255).astype(np.uint8))
+    out = BytesIO()
+    im.save(out, format="JPEG", quality=quality)
+    out.seek(0)
+    return np.asarray(Image.open(out)) / 255.0
+
+def sharpen_image(im: np.ndarray, amount=1) -> np.ndarray:
+    im = Image.fromarray((im * 255).astype(np.uint8))
+    return np.asarray(ImageEnhance.Sharpness(im).enhance(amount)) / 255.0
 
 
 def _get_parser():
