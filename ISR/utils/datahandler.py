@@ -185,20 +185,20 @@ class DataHandler:
         crops['hr'] = np.array(crops['hr'])
         return crops
     
-    def _apply_transform(self, img, transform_selection, kind, compression_quality=None, sharpen_amount=None):
+    def _apply_transform(self, img, transform_selection, kind, compression_quality=None, sharpen_amount=None, i=None):
         """ Rotates and flips input image according to transform_selection. """
 
-        write_image('/opt/ml/output/orig.png', img)
+        write_image(f'/opt/ml/output/orig-{kind}-{i}.png', img)
 
         # the type: np.ndarray
         if kind == 'lr' and compression_quality is not None:
             # print('Apply compression of', compression_quality)
             img = compress_image(img, quality=compression_quality)
-            write_image('/opt/ml/output/compressed.png', img)
+            write_image(f'/opt/ml/output/compressed-{kind}-{i}.png', img)
         elif kind == 'hr' and sharpen_amount is not None:
             # print('Apply sharpening of', sharpen_amount)
             img = sharpen_image(img, amount=sharpen_amount)
-            write_image('/opt/ml/output/sharpened.png', img)
+            write_image(f'/opt/ml/output/sharpened-{kind}-{i}.png', img)
         
         rotate = {
             0: lambda x: x,
@@ -217,7 +217,7 @@ class DataHandler:
         
         img = rotate[rot_direction](img)
         img = flip[flip_axis](img)
-        write_image('/opt/ml/output/final.png', img)
+        write_image(f'/opt/ml/output/final-{kind}-{i}.png', img)
         
         return img
     
@@ -225,7 +225,7 @@ class DataHandler:
         """ Transforms each individual image of the batch independently. """
         
         t_batch = np.array(
-            [self._apply_transform(img, transforms[i], kind, compression_quality=compression_quality, sharpen_amount=sharpen_amount) for i, img in enumerate(batch)]
+            [self._apply_transform(img, transforms[i], kind, compression_quality=compression_quality, sharpen_amount=sharpen_amount, i) for i, img in enumerate(batch)]
         )
         return t_batch
     
