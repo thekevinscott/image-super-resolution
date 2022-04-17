@@ -192,11 +192,11 @@ class DataHandler:
 
         # the type: np.ndarray
         if kind == 'lr' and compression_quality is not None:
-            # print('Apply compression of', compression_quality)
+            print('Apply compression of', compression_quality)
             img = compress_image(img, quality=compression_quality)
             write_image(f'/opt/ml/output/{kind}-{i}-compressed-{compression_quality}.png', img)
         elif kind == 'hr' and sharpen_amount is not None:
-            # print('Apply sharpening of', sharpen_amount)
+            print('Apply sharpening of', sharpen_amount)
             img = sharpen_image(img, amount=sharpen_amount)
             write_image(f'/opt/ml/output/{kind}-{i}-sharpened-{sharpen_amount}.png', img)
         
