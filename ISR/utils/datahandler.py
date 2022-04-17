@@ -188,17 +188,17 @@ class DataHandler:
     def _apply_transform(self, img, transform_selection, kind, compression_quality=None, sharpen_amount=None, i=None):
         """ Rotates and flips input image according to transform_selection. """
 
-        write_image(f'/opt/ml/output/orig-{kind}-{i}.png', img)
+        write_image(f'/opt/ml/output/{kind}-{i}-orig.png', img)
 
         # the type: np.ndarray
         if kind == 'lr' and compression_quality is not None:
             # print('Apply compression of', compression_quality)
             img = compress_image(img, quality=compression_quality)
-            write_image(f'/opt/ml/output/compressed-{kind}-{i}.png', img)
+            write_image(f'/opt/ml/output/{kind}-{i}-compressed.png', img)
         elif kind == 'hr' and sharpen_amount is not None:
             # print('Apply sharpening of', sharpen_amount)
             img = sharpen_image(img, amount=sharpen_amount)
-            write_image(f'/opt/ml/output/sharpened-{kind}-{i}.png', img)
+            write_image(f'/opt/ml/output/{kind}-{i}-sharpened.png', img)
         
         rotate = {
             0: lambda x: x,
@@ -211,13 +211,13 @@ class DataHandler:
             1: lambda x: np.flip(x, 0),  # flip along horizontal axis
             2: lambda x: np.flip(x, 1),  # flip along vertical axis
         }
+        write_image(f'/opt/ml/output/{kind}-{i}-final.png', img)
         
         rot_direction = transform_selection[0]
         flip_axis = transform_selection[1]
         
         img = rotate[rot_direction](img)
         img = flip[flip_axis](img)
-        write_image(f'/opt/ml/output/final-{kind}-{i}.png', img)
         
         return img
     
