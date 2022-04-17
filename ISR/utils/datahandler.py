@@ -196,6 +196,7 @@ class DataHandler:
             # print('Apply compression of', compression_quality)
             if vary_compression_quality:
                 compression_quality = random.randint(compression_quality, 100)
+                print('Variable compression, using', compression_quality)
             img = compress_image(img, quality=compression_quality)
             write_image(f'/opt/ml/output/{kind}-{i}-compressed-{compression_quality}.png', img)
         elif kind == 'hr' and sharpen_amount is not None:
