@@ -225,7 +225,7 @@ class DataHandler:
         """ Transforms each individual image of the batch independently. """
         
         t_batch = np.array(
-            [self._apply_transform(img, transforms[i], kind, compression_quality=compression_quality, sharpen_amount=sharpen_amount, i) for i, img in enumerate(batch)]
+            [self._apply_transform(img, transforms[i], kind, compression_quality=compression_quality, sharpen_amount=sharpen_amount, i=i) for i, img in enumerate(batch)]
         )
         return t_batch
     
