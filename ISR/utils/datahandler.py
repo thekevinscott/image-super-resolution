@@ -1,4 +1,5 @@
 from bz2 import compress
+print('********* YES')
 import json
 import os
 import random
@@ -66,8 +67,10 @@ class DataHandler:
     
     def _make_img_list(self, should_check_size=True):
         """ Creates a dictionary of lists of the acceptable images contained in lr_dir and hr_dir. """
+        hr_len = len(list(os.listdir(self.folders['hr'])))
+        lr_len = len(list(os.listdir(self.folders['lr'])))
         
-        assert len(list(os.listdir(self.folders['hr']))) == len(list(os.listdir(self.folders['lr']))), "Different number of files in lr and hr directories"
+        assert hr_len == lr_len, f"Different number of files in lr and hr directories: {hr_len}, {lr_len}"
         lr_file_names = []
         hr_file_names = []
         for file in tqdm(list(os.listdir(self.folders['lr']))):
