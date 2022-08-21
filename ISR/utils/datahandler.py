@@ -139,6 +139,8 @@ class DataHandler:
         Square crops of size patch_size are taken from the selected
         top left corners.
         """
+        for i in (imgs['lr'], imgs['hr']):
+            print(i.shape)
         
         slices = {}
         crops = {}
@@ -171,7 +173,6 @@ class DataHandler:
         
         for slice_index, s in enumerate(slices['lr']):
             candidate_crop = imgs['lr'][s['x'][0]: s['x'][1], s['y'][0]: s['y'][1], slice(None)]
-            print('candidate crop shape for slice index ', candidate_crop.shape)
             if self._not_flat(candidate_crop, flatness) or n == 0:
                 crops['lr'].append(candidate_crop)
                 accepted_slices['lr'].append(slice_index)
