@@ -261,6 +261,11 @@ class DataHandler:
             img[res] = imageio.imread(img_path) / 255.0
             print(img_path, img[res].shape)
 
+        if (img['lr'].shape[0] == img['hr'].shape[0] / self.scale and img['lr'].shape[1] == img['hr'].shape[1] / self.scale) == False:
+            print(img['lr'].shape)
+            print(img['hr'].shape)
+            raise Exception('Unexpected shapes in images')
+
         batch = self._crop_imgs(img, batch_size, flatness)
         transforms = np.random.randint(0, 3, (batch_size, 2))
         batch['lr'] = self._transform_batch(batch['lr'], transforms, 'lr', compression_quality=compression_quality, vary_compression_quality=vary_compression_quality)
