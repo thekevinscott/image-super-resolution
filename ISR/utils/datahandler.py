@@ -1,5 +1,4 @@
 from bz2 import compress
-print('********* YES')
 import json
 import os
 import random
@@ -45,32 +44,13 @@ class DataHandler:
             if min_side < self.patch_size[res]:
                 return False
         return file.endswith(self.extensions)
-        #         if not idx:
-        #     # randomly select one image. idx is given at validation time.
-        #     min_side = 0
-        #     while min_side < self.patch_size['lr']:
-        #         idx = np.random.choice(range(len(self.img_list['hr'])))
-        #         lr_img_path = os.path.join(self.folders['lr'], self.img_list['lr'][idx])
-        #         img['lr'] = imageio.imread(lr_img_path) / 255.0
-        #         data = np.asarray(img['lr'])
-        #         min_side = min(data.shape[0:2])
-        #         print('min side', min_side)
-        #         print('self patch size', self.patch_size['lr'])
-        #     hr_img_path = os.path.join(self.folders['hr'], self.img_list['hr'][idx])
-        #     img['hr'] = imageio.imread(hr_img_path) / 255.0
-        # else:
-        #     print('idx is specified', idx)
-        #     for res in ['lr', 'hr']:
-        #         img_path = os.path.join(self.folders[res], self.img_list[res][idx])
-        #         img[res] = imageio.imread(img_path) / 255.0
-        # print('lr shape', img['lr'].shape)
     
     def _make_img_list(self, should_check_size=True):
         """ Creates a dictionary of lists of the acceptable images contained in lr_dir and hr_dir. """
         hr_len = len(list(os.listdir(self.folders['hr'])))
         lr_len = len(list(os.listdir(self.folders['lr'])))
         
-        assert hr_len == lr_len, f"Different number of files in lr and hr directories: {hr_len}, {lr_len}"
+        assert hr_len == lr_len, f"Different number of files in lr and hr directories: {hr_len}, {lr_len}, {self.folders['hr']}, {self.folders['lr']}"
         lr_file_names = []
         hr_file_names = []
         for file in tqdm(list(os.listdir(self.folders['lr']))):
@@ -83,8 +63,6 @@ class DataHandler:
         self.img_list['lr'] = np.sort(lr_file_names)
         self.img_list['hr'] = np.sort(hr_file_names)
 
-        # print(self.img_list['hr'])
-        # print(self.img_list['lr'])
         if np.array_equal(self.img_list['hr'], self.img_list['lr']) is False:
             raise Exception('Images do not match')
         
@@ -105,9 +83,7 @@ class DataHandler:
         except:
             LR_name_root = [x.split('.')[0].rsplit('x', 1)[0] for x in self.img_list['lr']]
             HR_name_root = [x.split('.')[0] for x in self.img_list['hr']]
-            print(LR_name_root)
-            print(HR_name_root)
-            raise Exception('Mismatch of datasets')
+            raise Exception('Mismatch of datasets: {HR_name_root} {LR_name_root}')
     
     def _matching_datasets(self):
         """ Rough file name matching between lr and hr directories. """
@@ -139,8 +115,6 @@ class DataHandler:
         Square crops of size patch_size are taken from the selected
         top left corners.
         """
-        for i in (imgs['lr'], imgs['hr']):
-            print(i.shape)
         
         slices = {}
         crops = {}
@@ -185,7 +159,6 @@ class DataHandler:
         
         for s in accepted_slices['hr']:
             candidate_crop = imgs['hr'][s['x'][0]: s['x'][1], s['y'][0]: s['y'][1], slice(None)]
-            print('candidate crop shape for hr images', candidate_crop.shape)
             crops['hr'].append(candidate_crop)
         
         crops['lr'] = np.array(crops['lr'])
@@ -204,7 +177,7 @@ class DataHandler:
             # print('Apply compression of', compression_quality)
             if vary_compression_quality:
                 compression_quality = random.randint(compression_quality, 100)
-                print('Variable compression, using', compression_quality)
+                # print('Variable compression, using', compression_quality)
             img = compress_image(img, quality=compression_quality)
             write_image(f'/opt/ml/output/{kind}-{i}-compressed-{compression_quality}.png', img)
         elif kind == 'hr' and sharpen_amount is not None:
@@ -261,10 +234,6 @@ class DataHandler:
             img_path = os.path.join(self.folders[res], self.img_list[res][idx])
             paths[res] = img_path
             img[res] = imageio.imread(img_path) / 255.0
-            if res == 'lr':
-                path_to_write = os.path.join(self.folders[res], self.img_list[res][idx] + '.inner.png')
-                imageio.imwrite(path_to_write, img[res])
-                print(f'wrote LR image at {path_to_write}')
 
         if (img['lr'].shape[0] == img['hr'].shape[0] / self.scale and img['lr'].shape[1] == img['hr'].shape[1] / self.scale) == False:
             hr_shape = img['hr'].shape
