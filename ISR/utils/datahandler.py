@@ -161,7 +161,6 @@ class DataHandler:
                         for x, y in zip(top_left['x'][res], top_left['y'][res])
                     ]
                 )
-            print(slices)
         except Exception as e:
             print('Exception with image')
             print('lr shape', imgs['lr'].shape)
@@ -184,11 +183,11 @@ class DataHandler:
         
         for s in accepted_slices['hr']:
             candidate_crop = imgs['hr'][s['x'][0]: s['x'][1], s['y'][0]: s['y'][1], slice(None)]
+            print(candidate_crop.shape)
             crops['hr'].append(candidate_crop)
         
         crops['lr'] = np.array(crops['lr'])
         crops['hr'] = np.array(crops['hr'])
-        print(crops)
         return crops
     
     def _apply_transform(self, img: np.ndarray, transform_selection, kind, compression_quality=None, sharpen_amount=None, i=None, vary_compression_quality=False):
