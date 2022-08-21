@@ -161,6 +161,7 @@ class DataHandler:
                         for x, y in zip(top_left['x'][res], top_left['y'][res])
                     ]
                 )
+            print(slices)
         except Exception as e:
             print('Exception with image')
             print('lr shape', imgs['lr'].shape)
@@ -187,12 +188,14 @@ class DataHandler:
         
         crops['lr'] = np.array(crops['lr'])
         crops['hr'] = np.array(crops['hr'])
+        print(crops)
         return crops
     
     def _apply_transform(self, img: np.ndarray, transform_selection, kind, compression_quality=None, sharpen_amount=None, i=None, vary_compression_quality=False):
         """ Rotates and flips input image according to transform_selection. """
 
-        print(img.shape)
+        if img.shape[0] == 0 or img.shape[1] == 0:
+            print('You provided a bad image shape', img.shape)
         write_image(f'/opt/ml/output/{kind}-{i}-orig.png', img)
 
         # the type: np.ndarray
