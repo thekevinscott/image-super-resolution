@@ -262,7 +262,9 @@ class DataHandler:
             paths[res] = img_path
             img[res] = imageio.imread(img_path) / 255.0
             if res == 'lr':
-                imageio.imwrite(os.path.join(self.folders[res], self.img_list[res][idx] + '.inner.png'), img[res])
+                path_to_write = os.path.join(self.folders[res], self.img_list[res][idx] + '.inner.png')
+                imageio.imwrite(path_to_write, img[res])
+                print(f'wrote LR image at {path_to_write}')
 
         if (img['lr'].shape[0] == img['hr'].shape[0] / self.scale and img['lr'].shape[1] == img['hr'].shape[1] / self.scale) == False:
             hr_shape = img['hr'].shape
