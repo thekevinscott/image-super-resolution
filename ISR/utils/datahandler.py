@@ -258,8 +258,8 @@ class DataHandler:
 
         for res in ['lr', 'hr']:
             img_path = os.path.join(self.folders[res], self.img_list[res][idx])
-            print(img_path)
             img[res] = imageio.imread(img_path) / 255.0
+            print(img_path, img[res].shape)
 
         batch = self._crop_imgs(img, batch_size, flatness)
         transforms = np.random.randint(0, 3, (batch_size, 2))
