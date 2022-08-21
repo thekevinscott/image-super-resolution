@@ -171,6 +171,7 @@ class DataHandler:
         
         for slice_index, s in enumerate(slices['lr']):
             candidate_crop = imgs['lr'][s['x'][0]: s['x'][1], s['y'][0]: s['y'][1], slice(None)]
+            print('candidate crop shape for slice index ', candidate_crop.shape)
             if self._not_flat(candidate_crop, flatness) or n == 0:
                 crops['lr'].append(candidate_crop)
                 accepted_slices['lr'].append(slice_index)
@@ -183,7 +184,7 @@ class DataHandler:
         
         for s in accepted_slices['hr']:
             candidate_crop = imgs['hr'][s['x'][0]: s['x'][1], s['y'][0]: s['y'][1], slice(None)]
-            print(candidate_crop.shape)
+            print('candidate crop shape for hr images', candidate_crop.shape)
             crops['hr'].append(candidate_crop)
         
         crops['lr'] = np.array(crops['lr'])
