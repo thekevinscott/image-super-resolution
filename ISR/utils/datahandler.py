@@ -256,15 +256,18 @@ class DataHandler:
             # randomly select one image. idx is given at validation time.
             idx = np.random.choice(range(len(self.img_list['hr'])))
 
+        paths = {}
         for res in ['lr', 'hr']:
             img_path = os.path.join(self.folders[res], self.img_list[res][idx])
+            paths[res] = img_path
             img[res] = imageio.imread(img_path) / 255.0
-            print(img_path, img[res].shape)
 
         if (img['lr'].shape[0] == img['hr'].shape[0] / self.scale and img['lr'].shape[1] == img['hr'].shape[1] / self.scale) == False:
-            print(img['lr'].shape)
-            print(img['hr'].shape)
-            raise Exception('Unexpected shapes in images')
+            hr_shape = img['hr'].shape
+            lr_shape = img['lr'].shape
+            hr_path = paths.get('hr')
+            lr_path = paths.get('lr')
+            raise Exception(f'Unexpected shapes in images: HR: {hr_shape} LR: {lr_shape}, for paths {hr_path}, {lr_path}')
 
         batch = self._crop_imgs(img, batch_size, flatness)
         transforms = np.random.randint(0, 3, (batch_size, 2))
