@@ -189,9 +189,10 @@ class DataHandler:
         crops['hr'] = np.array(crops['hr'])
         return crops
     
-    def _apply_transform(self, img, transform_selection, kind, compression_quality=None, sharpen_amount=None, i=None, vary_compression_quality=False):
+    def _apply_transform(self, img: np.ndarray, transform_selection, kind, compression_quality=None, sharpen_amount=None, i=None, vary_compression_quality=False):
         """ Rotates and flips input image according to transform_selection. """
 
+        print(img.shape)
         write_image(f'/opt/ml/output/{kind}-{i}-orig.png', img)
 
         # the type: np.ndarray
