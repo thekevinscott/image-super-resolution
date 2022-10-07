@@ -324,7 +324,7 @@ class Trainer:
                 self.logger.info('Current flatness treshold: {}'.format(flatness))
 
             epoch_start = time()
-            for step in tqdm(range(steps_per_epoch), desc=f'Steps per epoch ({steps_per_epoch})'):
+            for step in tqdm(range(steps_per_epoch), desc=f'Steps per epoch ({steps_per_epoch})', position=0, leave=True):
                 batch = self.train_dh.get_batch(batch_size, flatness=flatness, compression_quality=compression_quality, sharpen_amount=sharpen_amount, vary_compression_quality=vary_compression_quality)
                 y_train = [batch['hr']]
                 training_losses = {}
