@@ -53,7 +53,8 @@ class DataHandler:
         assert hr_len == lr_len, f"Different number of files in lr and hr directories: {hr_len}, {lr_len}, {self.folders['hr']}, {self.folders['lr']}"
         lr_file_names = []
         hr_file_names = []
-        for file in tqdm(list(os.listdir(self.folders['lr']))):
+        lr_folder = self.folders['lr']
+        for file in tqdm(list(os.listdir(self.folders['lr'])), desc=f'Processing folder {lr_folder}'):
             hr_folder = self.folders['hr']
             if os.path.exists(f'{hr_folder}/{file}'):
                 if self._is_valid_img(file, 'lr', should_check_size=should_check_size):
