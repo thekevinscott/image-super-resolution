@@ -171,7 +171,7 @@ class DataHandler:
 
         if img.shape[0] == 0 or img.shape[1] == 0:
             print('You provided a bad image shape', img.shape)
-        write_image(f'/opt/ml/output/{kind}-{i}-orig.png', img)
+        # write_image(f'/opt/ml/output/{kind}-{i}-orig.png', img)
 
         # the type: np.ndarray
         if kind == 'lr' and compression_quality is not None:
@@ -180,11 +180,11 @@ class DataHandler:
                 compression_quality = random.randint(compression_quality, 100)
                 # print('Variable compression, using', compression_quality)
             img = compress_image(img, quality=compression_quality)
-            write_image(f'/opt/ml/output/{kind}-{i}-compressed-{compression_quality}.png', img)
+            # write_image(f'/opt/ml/output/{kind}-{i}-compressed-{compression_quality}.png', img)
         elif kind == 'hr' and sharpen_amount is not None:
             # print('Apply sharpening of', sharpen_amount)
             img = sharpen_image(img, amount=sharpen_amount)
-            write_image(f'/opt/ml/output/{kind}-{i}-sharpened-{sharpen_amount}.png', img)
+            # write_image(f'/opt/ml/output/{kind}-{i}-sharpened-{sharpen_amount}.png', img)
         
         rotate = {
             0: lambda x: x,

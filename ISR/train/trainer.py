@@ -325,35 +325,52 @@ class Trainer:
 
             epoch_start = time()
             for step in tqdm(range(steps_per_epoch), desc=f'Steps per epoch #{epoch} ({steps_per_epoch})', position=0, leave=True):
+                print('a')
                 batch = self.train_dh.get_batch(batch_size, flatness=flatness, compression_quality=compression_quality, sharpen_amount=sharpen_amount, vary_compression_quality=vary_compression_quality)
+                print('b')
                 y_train = [batch['hr']]
                 training_losses = {}
 
                 ## Discriminator training
                 if self.discriminator:
+                    print('c')
                     sr = self.generator.model.predict(batch['lr'])
+                    print('d')
                     d_loss_real = self.discriminator.model.train_on_batch(batch['hr'], valid)
+                    print('e')
                     d_loss_fake = self.discriminator.model.train_on_batch(sr, fake)
+                    print('f')
                     d_loss_fake = self._format_losses(
                         'train_d_fake_', d_loss_fake, self.discriminator.model.metrics_names
                     )
+                    print('g')
                     d_loss_real = self._format_losses(
                         'train_d_real_', d_loss_real, self.discriminator.model.metrics_names
                     )
+                    print('h')
                     training_losses.update(d_loss_real)
+                    print('i')
                     training_losses.update(d_loss_fake)
+                    print('j')
                     y_train.append(valid)
 
                 ## Generator training
                 if self.feature_extractor:
+                    print('k')
                     hr_feats = self.feature_extractor.model.predict(batch['hr'])
+                    print('l')
                     y_train.extend([*hr_feats])
 
+                print('m')
                 model_losses = self.model.train_on_batch(batch['lr'], y_train)
+                print('n')
                 model_losses = self._format_losses('train_', model_losses, self.model.metrics_names)
+                print('o')
                 training_losses.update(model_losses)
 
+                print('p')
                 self.tensorboard.on_epoch_end(epoch * steps_per_epoch + step, training_losses)
+                print('q')
                 self.logger.debug('Losses at step {s}:\n {l}'.format(s=step, l=training_losses))
 
             elapsed_time = time() - epoch_start
