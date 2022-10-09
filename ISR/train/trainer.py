@@ -331,7 +331,7 @@ class Trainer:
 
                 ## Discriminator training
                 if self.discriminator:
-                    print('c', self.generator, self.generator.model, self.generator.model.predict)
+                    print('c', batch['lr'])
                     sr = self.generator.model.predict(batch['lr'], verbose=0)
                     print('d')
                     d_loss_real = self.discriminator.model.train_on_batch(batch['hr'], valid)
