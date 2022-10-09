@@ -360,7 +360,7 @@ class Trainer:
                 print('k')
                 if self.feature_extractor:
                     print('l')
-                    hr_feats = self.feature_extractor.model.predict(batch['hr'])
+                    hr_feats = self.feature_extractor.model.predict(batch['hr'], verbose=0)
                     print('m')
                     y_train.extend([*hr_feats])
                     print('n')
