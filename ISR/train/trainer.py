@@ -314,22 +314,15 @@ class Trainer:
             validation_feats = self.feature_extractor.model.predict(validation_set['hr'])
             y_validation.extend([*validation_feats])
 
-        print('a1')
         for epoch in range(starting_epoch, epochs):
-            print('a2')
             self.logger.info('Epoch {e}/{tot_eps}'.format(e=epoch, tot_eps=epochs))
-            print('a3')
             K.set_value(self.model.optimizer.lr, self._lr_scheduler(epoch=epoch))
-            print('a4')
             self.logger.info('Current learning rate: {}'.format(K.eval(self.model.optimizer.lr)))
 
-            print('a5')
             flatness = self._flatness_scheduler(epoch)
-            print('a6')
             if flatness:
                 self.logger.info('Current flatness treshold: {}'.format(flatness))
 
-            print('a7')
             epoch_start = time()
             for step in tqdm(range(steps_per_epoch), desc=f'Steps per epoch #{epoch} ({steps_per_epoch})', position=0, leave=True):
                 print('a8')
@@ -364,16 +357,26 @@ class Trainer:
                     y_train.append(valid)
 
                 ## Generator training
+                print('k')
                 if self.feature_extractor:
+                    print('l')
                     hr_feats = self.feature_extractor.model.predict(batch['hr'])
+                    print('m')
                     y_train.extend([*hr_feats])
+                    print('n')
 
+                print('o')
                 model_losses = self.model.train_on_batch(batch['lr'], y_train)
+                print('p')
                 model_losses = self._format_losses('train_', model_losses, self.model.metrics_names)
+                print('w')
                 training_losses.update(model_losses)
+                print('x')
 
                 self.tensorboard.on_epoch_end(epoch * steps_per_epoch + step, training_losses)
+                print('y')
                 self.logger.debug('Losses at step {s}:\n {l}'.format(s=step, l=training_losses))
+                print('z')
 
             elapsed_time = time() - epoch_start
             self.logger.info('Epoch {} took {:10.1f}s'.format(epoch, elapsed_time))
