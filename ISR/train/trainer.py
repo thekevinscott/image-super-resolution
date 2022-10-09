@@ -331,19 +331,24 @@ class Trainer:
 
                 ## Discriminator training
                 if self.discriminator:
-                    print('c', batch['lr'])
                     sr = self.generator.model.predict(batch['lr'], verbose=0)
                     print('d')
                     d_loss_real = self.discriminator.model.train_on_batch(batch['hr'], valid)
+                    print('e')
                     d_loss_fake = self.discriminator.model.train_on_batch(sr, fake)
+                    print('f')
                     d_loss_fake = self._format_losses(
                         'train_d_fake_', d_loss_fake, self.discriminator.model.metrics_names
                     )
+                    print('g')
                     d_loss_real = self._format_losses(
                         'train_d_real_', d_loss_real, self.discriminator.model.metrics_names
                     )
+                    print('h')
                     training_losses.update(d_loss_real)
+                    print('i')
                     training_losses.update(d_loss_fake)
+                    print('j')
                     y_train.append(valid)
 
                 ## Generator training
