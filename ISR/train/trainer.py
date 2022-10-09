@@ -331,7 +331,9 @@ class Trainer:
 
                 ## Discriminator training
                 if self.discriminator:
+                    print('c', self.generator, self.generator.model, self.generator.model.predict)
                     sr = self.generator.model.predict(batch['lr'], verbose=0)
+                    print('d')
                     d_loss_real = self.discriminator.model.train_on_batch(batch['hr'], valid)
                     d_loss_fake = self.discriminator.model.train_on_batch(sr, fake)
                     d_loss_fake = self._format_losses(
