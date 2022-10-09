@@ -314,19 +314,29 @@ class Trainer:
             validation_feats = self.feature_extractor.model.predict(validation_set['hr'])
             y_validation.extend([*validation_feats])
 
+        print('a1')
         for epoch in range(starting_epoch, epochs):
+            print('a2')
             self.logger.info('Epoch {e}/{tot_eps}'.format(e=epoch, tot_eps=epochs))
+            print('a3')
             K.set_value(self.model.optimizer.lr, self._lr_scheduler(epoch=epoch))
+            print('a4')
             self.logger.info('Current learning rate: {}'.format(K.eval(self.model.optimizer.lr)))
 
+            print('a5')
             flatness = self._flatness_scheduler(epoch)
+            print('a6')
             if flatness:
                 self.logger.info('Current flatness treshold: {}'.format(flatness))
 
+            print('a7')
             epoch_start = time()
             for step in tqdm(range(steps_per_epoch), desc=f'Steps per epoch #{epoch} ({steps_per_epoch})', position=0, leave=True):
+                print('a8')
                 batch = self.train_dh.get_batch(batch_size, flatness=flatness, compression_quality=compression_quality, sharpen_amount=sharpen_amount, vary_compression_quality=vary_compression_quality)
+                print('a9')
                 y_train = [batch['hr']]
+                print('a10')
                 training_losses = {}
 
                 print('b')
