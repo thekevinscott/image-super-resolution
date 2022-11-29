@@ -349,12 +349,18 @@ class Trainer:
                     hr_feats = self.feature_extractor.model.predict(batch['hr'], verbose=0)
                     y_train.extend([*hr_feats])
 
-                model_losses = self.model.train_on_batch(batch['lr'], y_train)
-                model_losses = self._format_losses('train_', model_losses, self.model.metrics_names)
-                training_losses.update(model_losses)
+                try:
+                    model_losses = self.model.train_on_batch(batch['lr'], y_train)
+                    model_losses = self._format_losses('train_', model_losses, self.model.metrics_names)
+                    training_losses.update(model_losses)
 
-                self.tensorboard.on_epoch_end(epoch * steps_per_epoch + step, training_losses)
-                self.logger.debug('Losses at step {s}:\n {l}'.format(s=step, l=training_losses))
+                    self.tensorboard.on_epoch_end(epoch * steps_per_epoch + step, training_losses)
+                    self.logger.debug('Losses at step {s}:\n {l}'.format(s=step, l=training_losses))
+                except Exception as e:
+                    print('Error')
+                    print(batch['lr'])
+                    print(y_train)
+                    raise e
 
             elapsed_time = time() - epoch_start
             self.logger.info('Epoch {} took {:10.1f}s'.format(epoch, elapsed_time))
