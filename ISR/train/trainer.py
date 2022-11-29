@@ -73,7 +73,7 @@ class Trainer:
             n_validation=None,
             flatness={'min': 0.0, 'increase_frequency': None, 'increase': 0.0, 'max': 0.0},
             learning_rate={'initial_value': 0.0004, 'decay_frequency': 100, 'decay_factor': 0.5},
-            adam_optimizer={'beta1': 0.9, 'beta2': 0.999, 'epsilon': None},
+            adam_optimizer={'beta1': 0.9, 'beta2': 0.999, 'epsilon': 0.001},
             losses={
                 'generator': 'mae',
                 'discriminator': 'binary_crossentropy',
