@@ -6,7 +6,7 @@ def get_logger(name, job_dir='.'):
     """ Returns logger that prints on stdout at INFO level and on file at DEBUG level. """
     
     logger = logging.getLogger(name)
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.WARNING)
     if not logger.handlers:
         # stream handler ensures that logging events are passed to stdout
         ch = logging.StreamHandler()
